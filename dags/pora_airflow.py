@@ -89,7 +89,7 @@ with DAG(dag_id='pora_bigquery_airflow',
                                                 "createDisposition":"CREATE_IF_NEEDED",                                          
                                         }
                                      },
-                            gcp_conn_id = 'gbq_key_in_connection'
+                           # gcp_conn_id = 'gbq_key_in_connection'
                             )
 
     task_vw_fa_lines = BigQueryInsertJobOperator(
@@ -112,7 +112,8 @@ with DAG(dag_id='pora_bigquery_airflow',
                                                 "createDisposition":"CREATE_IF_NEEDED",   
                                         }
                                      },
-                            gcp_conn_id = 'gbq_key_in_connection')
+                            #gcp_conn_id = 'gbq_key_in_connection'
+                            )
 
     task_vw_fa_header_props = BigQueryInsertJobOperator(
                                     task_id = 'task_vw_fa_header_props',
@@ -134,11 +135,11 @@ with DAG(dag_id='pora_bigquery_airflow',
                                                 "createDisposition":"CREATE_IF_NEEDED",   
                                         }
                                      },
-                                    gcp_conn_id = 'gbq_key_in_connection'
+                                  #  gcp_conn_id = 'gbq_key_in_connection'
                                 )
 
     end = EmptyOperator(task_id='end')
 
     #[task_vw_fa_lines_v2, task_vw_fa_lines] >> task_vw_fa_header_props >>
 
-    start >>  task_vw_fa_lines_v2 >>   end
+    start >>  task_vw_fa_lines_predata >> task_vw_fa_lines_v2 >>   end
