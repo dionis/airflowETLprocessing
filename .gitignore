@@ -3,3 +3,4 @@ logs/*
 .env
 gcp_info/*
 gcp_info/
+docker-compose.yaml
