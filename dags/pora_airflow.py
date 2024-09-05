@@ -69,46 +69,77 @@ with DAG(dag_id='pora_bigquery_airflow',
                                    # gcp_conn_id = 'gbq_key_in_connection'   
                                 )
 
-    # task_vw_fa_lines_v2 = BigQueryInsertJobOperator(
-    #                         task_id = 'task_vw_fa_lines_v2',
-    #                         configuration = {
-    #                                     "query": {
-    #                                         "query": "select * from import_pora.vw_fa_lines_v2",
-    #                                         "useLegacySql": False,
-    #                                         "priority": "BATCH",
-    #                                         "destinationTable": "pora_exports.PORAClient_ClaimDetails_v2_fa",
-    #                                     }
-    #                                  },
-    #                         gcp_conn_id = 'gbq_key_in_connection'
-    #                         )
+    task_vw_fa_lines_v2 = BigQueryInsertJobOperator(
+                            task_id = 'task_vw_fa_lines_v2',
+                            configuration = {
+                                        "query": {
+                                            "query": "select * from vw_fa_lines_v2",
+                                            "useLegacySql": False,
+                                            "priority": "BATCH",
+                                            "destinationTable": {
+                                                "projectId": "gen-lang-client-0781718982",
+                                                "datasetId": "pora_exports",
+                                                "tableId": "PORAClient_ClaimDetails_v2_fa_vw"
+                                                },
+                                                "defaultDataset": {
+                                                     "projectId": "gen-lang-client-0781718982",
+                                                     "datasetId": "pora_import",
+                                                },
+                                                "writeDisposition":"WRITE_APPEND",
+                                                "createDisposition":"CREATE_IF_NEEDED",                                          
+                                        }
+                                     },
+                           # gcp_conn_id = 'gbq_key_in_connection'
+                            )
 
-    # task_vw_fa_lines = BigQueryInsertJobOperator(
-    #                                 task_id = 'task_vw_fa_lines',
-    #                                 configuration = {
-    #                                     "query": {
-    #                                         "query": "select * from import_pora.vw_fa_lines",
-    #                                         "useLegacySql": False,
-    #                                         "priority": "BATCH",
-    #                                         "destinationTable": "pora_exports.PORAClient_ClaimDetails_fa",
-    #                                     }
-    #                                  },
-    #                         gcp_conn_id = 'gbq_key_in_connection')
+    task_vw_fa_lines = BigQueryInsertJobOperator(
+                                    task_id = 'task_vw_fa_lines',
+                                    configuration = {
+                                        "query": {
+                                            "query": "select * from vw_fa_lines",
+                                            "useLegacySql": False,
+                                            "priority": "BATCH",                                        
+                                             "destinationTable": {
+                                                "projectId": "gen-lang-client-0781718982",
+                                                "datasetId": "pora_exports",
+                                                "tableId": "PORAClient_ClaimDetails_fa"
+                                                },
+                                                 "defaultDataset": {
+                                                     "projectId": "gen-lang-client-0781718982",
+                                                     "datasetId": "pora_import",
+                                                },
+                                                "writeDisposition":"WRITE_APPEND",
+                                                "createDisposition":"CREATE_IF_NEEDED",   
+                                        }
+                                     },
+                            #gcp_conn_id = 'gbq_key_in_connection'
+                            )
 
-    # task_vw_fa_header_props = BigQueryInsertJobOperator(
-    #                                 task_id = 'task_vw_fa_header_props',
-    #                                 configuration = {
-    #                                     "query": {
-    #                                         "query": "select * from import.vw_fa_header_props",
-    #                                         "useLegacySql": False,
-    #                                         "priority": "BATCH",
-    #                                         "destinationTable": "pora_import.tb_fa_header_props",
-    #                                     }
-    #                                  },
-    #                                 gcp_conn_id = 'gbq_key_in_connection'
-    #                             )
+    task_vw_fa_header_props = BigQueryInsertJobOperator(
+                                    task_id = 'task_vw_fa_header_props',
+                                    configuration = {
+                                        "query": {
+                                            "query": "select * from vw_fa_header_props",
+                                            "useLegacySql": False,
+                                            "priority": "BATCH",
+                                             "destinationTable": {
+                                                "projectId": "gen-lang-client-0781718982",
+                                                "datasetId": "pora_import",
+                                                "tableId": "tb_fa_header_props"
+                                                },
+                                              "defaultDataset": {
+                                                     "projectId": "gen-lang-client-0781718982",
+                                                     "datasetId": "pora_import",
+                                                },
+                                                "writeDisposition":"WRITE_APPEND",
+                                                "createDisposition":"CREATE_IF_NEEDED",   
+                                        }
+                                     },
+                                  #  gcp_conn_id = 'gbq_key_in_connection'
+                                )
 
     end = EmptyOperator(task_id='end')
 
     #[task_vw_fa_lines_v2, task_vw_fa_lines] >> task_vw_fa_header_props >>
 
-    start >> task_vw_fa_lines_predata >>   end
+    start >>  task_vw_fa_lines_predata >> task_vw_fa_lines_v2 >> task_vw_fa_lines >> task_vw_fa_header_props >>   end
