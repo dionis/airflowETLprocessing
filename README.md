@@ -3,6 +3,8 @@ Proyect with Apache Ariflow for ETL supporting
 
 **Apache-Airflow Bibliografy:**
 
+- [Ariflow Concept](https://airflow.apache.org/docs/apache-airflow/1.10.2/concepts.html)
+
 - [LIVE with Astronomer: Airflow VSCode Extension](https://www.youtube.com/watch?v=glrffDNra5M)
 
 - [Airflow](https://marketplace.visualstudio.com/items?itemName=NecatiARSLAN.airflow-vscode-extension)
@@ -40,3 +42,21 @@ Proyect with Apache Ariflow for ETL supporting
 - [Install Airflow](https://airflow.apache.org/docs/apache-airflow/stable/start.html)
 
 - [Installing Apache Airflow on Linux: A Comprehensive Guide](https://medium.com/@maroofashraf987/installing-apache-airflow-on-linux-a-comprehensive-guide-5462b265e961)
+
+
+## 
+## Email template configuration
+
+- [Apache Airflow Email Operator Guide - August 2024](https://www.restack.io/docs/airflow-knowledge-email-operator-example)
+
+- [Email Configuration](https://airflow.apache.org/docs/apache-airflow/stable/howto/email-config.html)
+
+##
+## Cross-DAG Dependencies in Apache Airflow: A Comprehensive Guide
+
+- [Cross-DAG Dependencies in Apache Airflow: A Comprehensive Guide](https://medium.com/datamindedbe/cross-dag-dependencies-in-apache-airflow-a-comprehensive-guide-88cbc0bc68d0)
+
+
+- [Cross-DAG Dependencies](https://airflow.apache.org/docs/apache-airflow/stable/howto/operator/external_task_sensor.html)
+
+- [Organize Airflow DAGs with Task Groups](https://jashbhatt776.medium.com/organize-airflow-dags-with-task-groups-627f5b6f1098)

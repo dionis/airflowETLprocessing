@@ -96,7 +96,7 @@ with DAG(dag_id='pora_bigquery_airflow',
                                     task_id = 'task_vw_fa_lines',
                                     configuration = {
                                         "query": {
-                                            "query": "select * from import_pora.vw_fa_lines",
+                                            "query": "select * from vw_fa_lines",
                                             "useLegacySql": False,
                                             "priority": "BATCH",                                        
                                              "destinationTable": {
@@ -119,7 +119,7 @@ with DAG(dag_id='pora_bigquery_airflow',
                                     task_id = 'task_vw_fa_header_props',
                                     configuration = {
                                         "query": {
-                                            "query": "select * from import.vw_fa_header_props",
+                                            "query": "select * from vw_fa_header_props",
                                             "useLegacySql": False,
                                             "priority": "BATCH",
                                              "destinationTable": {
@@ -142,4 +142,4 @@ with DAG(dag_id='pora_bigquery_airflow',
 
     #[task_vw_fa_lines_v2, task_vw_fa_lines] >> task_vw_fa_header_props >>
 
-    start >>  task_vw_fa_lines_predata >> task_vw_fa_lines_v2 >>   end
+    start >>  task_vw_fa_lines_predata >> task_vw_fa_lines_v2 >> task_vw_fa_lines >> task_vw_fa_header_props >>   end

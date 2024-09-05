@@ -63,14 +63,17 @@ x-airflow-common:
     _PIP_ADDITIONAL_REQUIREMENTS: 'apache-airflow-providers-smtp'
     #${_PIP_ADDITIONAL_REQUIREMENTS:-}
 
-    AIRFLOW__EMAIL__EMAIL_BACKEND: airflow.utils.email.send_email_smtp
-    AIRFLOW__SMTP__SMTP_HOST: smtp.office365.com
-    AIRFLOW__SMTP__START_TLS: True
+    AIRFLOW__EMAIL__EMAIL_BACKEND: 'airflow.utils.email.send_email_smtp'
+    AIRFLOW__SMTP__SMTP_HOST: 'smtp.mandrillapp.com'
+    AIRFLOW__SMTP__START_TLS: False
     AIRFLOW__SMTP__SMTP_SSL: False
-    AIRFLOW__SMTP__SMTP_USER: no-reply@pora.app
-    AIRFLOW__SMTP__SMTP_PASSWORD: kjs64$$jnJH2@3
+    AIRFLOW__SMTP__SMTP_USER: 'ProDev Solution LLC'
+    AIRFLOW__SMTP__SMTP_PASSWORD: 'DNzRfRGPpPjI-xQ6JsMyYQ'
     AIRFLOW__SMTP__SMTP_PORT: 587
-    AIRFLOW__SMTP__SMTP_MAIL_FROM: info@prodevsolution.com
+    AIRFLOW__SMTP__SMTP_MAIL_FROM: 'info@prodevsolution.com'
+
+    AIRFLOW__EMAIL__HTML_CONTENT_TEMPLATE: '/opt/airflow/email_templates/body/body.ji2'
+
     #AIRFLOW__EMAIL__EMAIL_CONN_ID: email_conn_id
 
     # Google cloud credentials
@@ -82,6 +85,7 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
     - ${AIRFLOW_PROJ_DIR:-.}/.config/gcloud/application_default_credentials.json:/opt/airflow/.config/gcloud/application_default_credentials.json
+    - ${AIRFLOW_PROJ_DIR:-.}/email_templates/body/:/opt/airflow/email_templates/body
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
