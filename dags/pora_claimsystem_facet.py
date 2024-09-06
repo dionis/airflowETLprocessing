@@ -28,15 +28,15 @@ with DAG(dag_id='pora_claysistem_facet_dag',
 
     start = EmptyOperator(task_id='start')
 
-    child_start_task1 = ExternalTaskSensor(
-        task_id = f"{PORA_CLAIMSYSTEM_NAME}_child_task1",
-        external_dag_id = 'pora_preprocessor_dag',
-        external_task_id = 'pora_preprocessor_dag_endtask',
-        timeout=600,
-        allowed_states = ["success"],
-        failed_states = ["failed", "skipped"],
-        mode = "reschedule",
-    )
+    # child_start_task1 = ExternalTaskSensor(
+    #     task_id = f"{PORA_CLAIMSYSTEM_NAME}_child_task1",
+    #     external_dag_id = 'pora_preprocessor_dag',
+    #     external_task_id = 'pora_preprocessor_dag_endtask',
+    #     timeout=600,
+    #     allowed_states = ["success"],
+    #     failed_states = ["failed", "skipped"],
+    #     mode = "reschedule",
+    # )
 
     def CLAIMSYSTEM_ehp_mc400_task():
         print(f"Running {PORA_CLAIMSYSTEM_NAME} tasks ")
@@ -52,4 +52,6 @@ with DAG(dag_id='pora_claysistem_facet_dag',
 
     end = EmptyOperator( task_id= f"{PORA_CLAIMSYSTEM_NAME}_endtask")
 
-    child_start_task1 >> start >> delay_python_task >> execute_python_task >> end
+    #child_start_task1 >> start >> delay_python_task >> execute_python_task >> end
+
+    start >> delay_python_task >> execute_python_task >> end

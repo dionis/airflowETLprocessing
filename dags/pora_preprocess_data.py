@@ -4,6 +4,8 @@ from airflow.operators.empty import EmptyOperator
 import time
 from airflow.operators.python import PythonOperator
 from airflow.sensors.external_task import ExternalTaskMarker, ExternalTaskSensor
+from airflow.operators.trigger_dagrun import TriggerDagRunOperator
+
 from datetime import datetime, timedelta 
 
 dag_owner = ''
@@ -35,17 +37,35 @@ with DAG(dag_id='pora_preprocessor_dag',
 
 
     ###----------------------Markert to diferen DAG -------------------------
+
+
+
+    trigger_remote_task_FACET = TriggerDagRunOperator(
+        task_id="trigger_remote_task_FACET",
+        trigger_dag_id="pora_claysistem_facet_dag",
+        conf={"message_event": "Preprocess data end for FACET"},
+        wait_for_completion=False,   
+    ) 
+
+
+
+    trigger_remote_task_USFHP = TriggerDagRunOperator(
+       task_id = "trigger_remote_task_USFHP",
+       trigger_dag_id = "pora_claysistem_usfhp_dag",
+       conf = {"message_event": "Preprocess data end for USFHP"},
+       wait_for_completion = False,   
+   ) 
    
-    pora_preprocess_parent_facet_task = ExternalTaskMarker(
-        task_id="pora_preprocess_parent_facet_task",
-        external_dag_id="pora_claysistem_facet_dag",
-        external_task_id="pora_claysistem_facet_dag_child_task1",
-    )
+    # pora_preprocess_parent_facet_task = ExternalTaskMarker(
+    #     task_id="pora_preprocess_parent_facet_task",
+    #     external_dag_id="pora_claysistem_facet_dag",
+    #     external_task_id="pora_claysistem_facet_dag_child_task1",
+    # )
 
-    pora_preprocess_parent_usfhp_task = ExternalTaskMarker(
-        task_id="pora_preprocess_parent_usfhp_task",
-        external_dag_id="pora_claysistem_usfhp_dag",
-        external_task_id="pora_claysistem_usfhp_dag_child_task1",
-    )
+    # pora_preprocess_parent_usfhp_task = ExternalTaskMarker(
+    #     task_id="pora_preprocess_parent_usfhp_task",
+    #     external_dag_id="pora_claysistem_usfhp_dag",
+    #     external_task_id="pora_claysistem_usfhp_dag_child_task1",
+    # )
 
-    start >> delay_python_task >> end
+    start >> delay_python_task >> [trigger_remote_task_FACET, trigger_remote_task_USFHP] >> end
