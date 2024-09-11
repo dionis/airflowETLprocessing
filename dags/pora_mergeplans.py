@@ -71,21 +71,17 @@ with DAG(dag_id ='pora_mergerplans',
     child_parent_facet_task1 = ExternalTaskSensor(
         task_id = f"child_parent_facet_task1",
         external_dag_id = 'pora_claysistem_facet_dag',
-        external_task_id = 'pora_claysistem_facet_dag_endtask',
-        timeout=600,
-        allowed_states = ["success"],
-        failed_states = ["failed", "skipped"],
-        mode = "reschedule",
+        external_task_id = 'delay_python_pora_claysistem_facet_dag_task',
+        execution_delta = timedelta(minutes = 2)
     )
 
-    child_parent_usfhp_task1 = ExternalTaskSensor(
-        task_id = f"child_parent_usfhp_task1",
-        external_dag_id = 'pora_claysistem_usfhp_dag',
-        external_task_id = 'pora_claysistem_usfhp_dag_endtask',
-        timeout=600,
-        allowed_states = ["success"],
-        failed_states = ["failed", "skipped"],
-        mode = "reschedule",
-    )
+    # child_parent_usfhp_task1 = ExternalTaskSensor(
+    #     task_id = f"child_parent_usfhp_task1",
+    #     external_dag_id = 'pora_claysistem_usfhp_dag',
+    #     external_task_id = 'pora_claysistem_usfhp_dag_endtask',
+    #     allowed_states = ["success"],
+    #     failed_states = ["failed", "skipped"],
+    #     mode = "reschedule",
+    # )
 
-    start >> [child_parent_facet_task1, child_parent_usfhp_task1] >> execute_python_task >> end
+    child_parent_facet_task1  >> start >> execute_python_task >> end

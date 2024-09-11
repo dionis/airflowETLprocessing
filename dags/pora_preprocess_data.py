@@ -28,10 +28,10 @@ with DAG(dag_id='pora_preprocessor_dag',
     start = EmptyOperator(task_id='start')
 
     def delay_time():
-        return lambda: time.sleep(300)
+        lambda: time.sleep(300)
     delay_python_task = PythonOperator(  task_id ="delay_python_task",
                                          dag = my_dag,
-                                         python_callable =  delay_time)
+                                         python_callable = delay_time)
 
     end = EmptyOperator( task_id = 'pora_preprocessor_dag_endtask')
 
@@ -41,10 +41,12 @@ with DAG(dag_id='pora_preprocessor_dag',
 
 
     trigger_remote_task_FACET = TriggerDagRunOperator(
-        task_id="trigger_remote_task_FACET",
-        trigger_dag_id="pora_claysistem_facet_dag",
-        conf={"message_event": "Preprocess data end for FACET"},
-        wait_for_completion=False,   
+        task_id = "trigger_remote_task_FACET",
+        trigger_dag_id = "pora_claysistem_facet_dag",
+        conf = {"message_event": "Preprocess data end for FACET"},
+        wait_for_completion = False,  
+        execution_date = '{{ ds }}',
+        reset_dag_run = True 
     ) 
 
 
@@ -53,7 +55,9 @@ with DAG(dag_id='pora_preprocessor_dag',
        task_id = "trigger_remote_task_USFHP",
        trigger_dag_id = "pora_claysistem_usfhp_dag",
        conf = {"message_event": "Preprocess data end for USFHP"},
-       wait_for_completion = False,   
+       wait_for_completion = False,  
+       execution_date = '{{ ds }}',
+       reset_dag_run = True       
    ) 
    
     # pora_preprocess_parent_facet_task = ExternalTaskMarker(
@@ -67,5 +71,12 @@ with DAG(dag_id='pora_preprocessor_dag',
     #     external_dag_id="pora_claysistem_usfhp_dag",
     #     external_task_id="pora_claysistem_usfhp_dag_child_task1",
     # )
+    #trigger_remote_task_USFHP
 
-    start >> delay_python_task >> [trigger_remote_task_FACET, trigger_remote_task_USFHP] >> end
+    #trigger_remote_task_FACET ,
+
+    #trigger_remote_task_USFHP
+
+    #
+
+    start >> delay_python_task >> trigger_remote_task_FACET >> trigger_remote_task_USFHP >> end 

@@ -60,3 +60,32 @@ Proyect with Apache Ariflow for ETL supporting
 - [Cross-DAG Dependencies](https://airflow.apache.org/docs/apache-airflow/stable/howto/operator/external_task_sensor.html)
 
 - [Organize Airflow DAGs with Task Groups](https://jashbhatt776.medium.com/organize-airflow-dags-with-task-groups-627f5b6f1098)
+
+
+## Trigger External Dags execution 
+
+- [The TriggerDagRunOperator in Airflow! Create DAG dependencies at ease](https://www.youtube.com/watch?v=8uKW0mPWmCk)
+
+- [Apache Airflow: Use TriggerDagRunOperator the right way](https://lshw.medium.com/apache-airflow-use-triggerdagrunoperator-the-right-way-df5db079b95c)
+
+
+## Airflow PythonOperator passing paremeters 
+
+- [passing paremeters](https://airflow.apache.org/docs/apache-airflow/1.10.3/howto/operator/python.html)
+
+
+## Loading process in PORA
+
+
+1- Copy file since File System to Google Cloud Store    
+- [Transfer data in Google Cloud Storage](https://airflow.apache.org/docs/apache-airflow-providers-google/stable/operators/transfer/gcs_to_gcs.html) 
+      
+ - [Airflow To Upload Multiple Files to Google Cloud Storage](https://medium.com/@ossama.assaghir/uploading-multiple-files-to-google-cloud-storage-using-airflow-a19c9126bcd9)
+
+- Google Query: Airflow copy Google Cloud Store
+
+2- Copy cvs file from Google Cloud Store to table in BigQuery
+   - [Google Cloud Storage Transfer Operator to BigQuery](https://airflow.apache.org/docs/apache-airflow-providers-google/stable/operators/transfer/gcs_to_bigquery.html)
+
+   - [Ingesting data into GCS and inserting them into BIG QUERY using Airflow (Composer)](https://medium.com/@deepakda1972/ingesting-data-into-gcs-and-inserting-them-into-big-query-using-airflow-composer-2d8001293b6e)
+    
