@@ -1,15 +1,22 @@
+from airflow.contrib.operators.gcs_to_bq import GoogleCloudStorageToBigQueryOperator
+from airflow.providers.google.cloud.transfers.local_to_gcs import LocalFilesystemToGCSOperator
+from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
+import os
 from airflow import DAG
 from airflow.decorators import task
 from airflow.operators.empty import EmptyOperator
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta 
 
+from google.cloud import storage
+
 dag_owner = ''
 
 default_args = {'owner': dag_owner,
         'depends_on_past': False,
         'retries': 2,
-        'retry_delay': timedelta(minutes=5)
+        'retry_delay': timedelta(minutes=5),
+        'execution_timeout': timedelta(seconds=6000)
         }
 
 ############################################################
@@ -29,10 +36,11 @@ with DAG(dag_id='upload_cv_files_to_gcs_rawdata',
         catchup=False,
         tags=['']
 ) as myDag:
+
     def upload_to_gcs(data_folder,gcs_path,**kwargs):
-        data_folder = your-local-dir
-        bucket_name = 'your-bucket-name'  # Your GCS bucket name
-        gcs_conn_id = 'your-gcp-connection-name'
+        data_folder = data_folder
+        bucket_name = 'pora_jhhc_data_develop'  # Your GCS bucket name
+        gcs_conn_id = 'gbq_key_in_connection'
 
         # List all CSV files in the data folder
         # Note : you can filter the files extentions with file.endswith('.csv')
@@ -40,28 +48,41 @@ with DAG(dag_id='upload_cv_files_to_gcs_rawdata',
         #            file.endswith('.json')
         #            file.endswith('.csv','json')
 
-        csv_files = [file for file in os.listdir(data_folder) if file.endswith('.csv')]
+        #print(f"File location using __file__ variable: {os.path.realpath(os.path.dirname(__file__))}")      
 
         # Upload each CSV file to GCS
-        for csv_file in csv_files:
-            local_file_path = os.path.join(data_folder, csv_file)
-            gcs_file_path = f"{gcs_path}/{csv_file}"
+        storage.blob._DEFAULT_CHUNKSIZE = 20 * 1024* 1024  # 5 MB
+        storage.blob._MAX_MULTIPART_SIZE = 20 * 1024* 1024  # 5 MB
 
-            #######################################################################
-            #
-            # The LocalFilesystemToGCSOperator is an Airflow operator designed specifically 
-            # for uploading files from a local filesystem to a GCS bucket.
-            #
-            ###################################################################
+        if not (os.path.exists(data_folder)):
+            print(f"Not  exits address in {data_folder}")
+        else:
+            csv_files = [file for file in os.listdir(data_folder) if file.endswith('.csv')]
+            
+            for csv_file in csv_files:
+                local_file_path = os.path.join(data_folder, csv_file)
+                gcs_file_path = f"{gcs_path}/{csv_file}"
 
-            upload_task = LocalFilesystemToGCSOperator(
-                task_id = f'upload_to_gcs',
-                src = local_file_path,
-                dst = gcs_file_path,
-                bucket = bucket_name,
-                gcp_conn_id = gcs_conn_id,
-            )
-            upload_task.execute(context=kwargs) 
+                print(f"Copy files from {local_file_path} to {gcs_file_path}...  ")
+
+            
+
+                #######################################################################
+                #
+                # The LocalFilesystemToGCSOperator is an Airflow operator designed specifically 
+                # for uploading files from a local filesystem to a GCS bucket.
+                #
+                ###################################################################
+
+                upload_task = LocalFilesystemToGCSOperator(
+                    task_id = f'upload_to_gcs',
+                    src = local_file_path,
+                    dst = gcs_file_path,
+                    bucket = bucket_name,
+                    gcp_conn_id = gcs_conn_id,
+                    execution_timeout = timedelta(minutes = 10)
+                )
+                upload_task.execute( context = kwargs) 
 
     start = EmptyOperator(task_id='start')
 
@@ -72,11 +93,25 @@ with DAG(dag_id='upload_cv_files_to_gcs_rawdata',
     #['your-local-dir', 'gcs-destination'],
     upload_to_gcs = PythonOperator(
         task_id = 'upload_to_gcs',
-        python_callable=upload_to_gcs,
-        op_args = ['../datasets', 'pora_rawdata'],
+        python_callable = upload_to_gcs,
+        op_args = ['/opt/airflow/datasets', 'rawdata'],
         provide_context = True,
     )
-
+    
+     
+    load_csv = GCSToBigQueryOperator(
+        
+        task_id="gcs_to_bigquery_example",
+        bucket="pora_jhhc_data_develop",
+        source_objects=["rawdata/insurance_claims_data.csv"],
+        destination_project_dataset_table='health_claim.insurance_claims_data',      
+        write_disposition="WRITE_TRUNCATE",
+        source_format = "csv",
+        external_table = False,
+        autodetect = True,
+        skip_leading_rows = 1
+    )
+    
     end = EmptyOperator(task_id='end')
 
-    start >> upload_to_gcs >> end#
+    start >> upload_to_gcs >> load_csv >> end#

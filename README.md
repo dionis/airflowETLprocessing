@@ -82,10 +82,16 @@ Proyect with Apache Ariflow for ETL supporting
       
  - [Airflow To Upload Multiple Files to Google Cloud Storage](https://medium.com/@ossama.assaghir/uploading-multiple-files-to-google-cloud-storage-using-airflow-a19c9126bcd9)
 
-- Google Query: Airflow copy Google Cloud Store
+## Google Query: Airflow copy Google Cloud Store
 
 2- Copy cvs file from Google Cloud Store to table in BigQuery
    - [Google Cloud Storage Transfer Operator to BigQuery](https://airflow.apache.org/docs/apache-airflow-providers-google/stable/operators/transfer/gcs_to_bigquery.html)
 
    - [Ingesting data into GCS and inserting them into BIG QUERY using Airflow (Composer)](https://medium.com/@deepakda1972/ingesting-data-into-gcs-and-inserting-them-into-big-query-using-airflow-composer-2d8001293b6e)
+
+   - [This module contains a Google Cloud Storage to BigQuery operator](https://airflow.apache.org/docs/apache-airflow-providers-google/stable/_api/airflow/providers/google/cloud/transfers/gcs_to_bigquery/index.html)
+
+## Apache Airflow Task Timeout 
+
+- [Apache Airflow Task Timeout Guide - August 2024](https://www.restack.io/docs/airflow-knowledge-apache-task-timeout)
     
