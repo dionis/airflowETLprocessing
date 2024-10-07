@@ -3,6 +3,8 @@ from airflow.providers.google.cloud.transfers.local_to_gcs import LocalFilesyste
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
 import os
 from airflow import DAG
+from airflow.models import Variable
+from airflow.utils.dates import days_ago
 from airflow.decorators import task
 from airflow.operators.empty import EmptyOperator
 from airflow.operators.python import PythonOperator
@@ -11,6 +13,20 @@ from datetime import datetime, timedelta
 from google.cloud import storage
 
 dag_owner = ''
+
+###
+#  Get local store file and Google Cloude Store addresss
+#
+###
+
+DATASET_ADDRESS = Variable.has_key('PORA_LOCAL_FILES_ADDRESS').get('PORA_LOCAL_FILES_ADDRESS') if  Variable.get('PORA_LOCAL_FILES_ADDRESS', default_var = None) not in ['', None] else '/opt/airflow/datasets/PORA/'
+
+GOOGLE_CLOUD_STORE_DIRECTORY_PORA = Variable.get('GOOGLE_CLOUD_STORE_DIRECTORY_PORA') if  Variable.get('GOOGLE_CLOUD_STORE_DIRECTORY_PORA', default_var = None) not in ['', None]  else 'rawdata'
+
+GOOGLE_CLOUDE_STORE_BUCKET_NAME_PORA = Variable.get('GOOGLE_CLOUDE_STORE_BUCKET_NAME_PORA') if  Variable.get('GOOGLE_CLOUDE_STORE_BUCKET_NAME_PORA', default_var = None) not in ['', None]  else 'pora_jhhc_data_develop'
+                       
+PORA_DATASET_BIGQUERY_NAME = Variable.get('PORA_DATASET_BIGQUERY_NAME') if  Variable.get('PORA_DATASET_BIGQUERY_NAME', default_var = None) not in ['', None] else 'import_dev'
+
 
 default_args = {'owner': dag_owner,
         'depends_on_past': False,
@@ -28,7 +44,7 @@ default_args = {'owner': dag_owner,
 #
 #      https://data-ai.theodo.com/blog-technique/create-bigquery-data-pipelines-with-airflow-and-docker
 ############################################################
-with DAG(dag_id='upload_cv_files_to_gcs_rawdata',
+with DAG(dag_id='upload_cv_files_to_gcs_rawdata_test',
         default_args=default_args,
         description='',
         start_date = datetime(2024, 9, 10),

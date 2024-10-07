@@ -20,7 +20,7 @@ PORA_CLAIMSYSTEM_NAME = 'pora_claysistem_facet_dag'
 with DAG(dag_id='pora_claysistem_facet_dag',
         default_args=default_args,
         description='',
-        start_date = datetime(day = 5, month = 9,year = 2024),
+        start_date = datetime(day = 1, month = 10,year = 2024),
         schedule_interval = None,
         catchup=False,
         tags=['']

@@ -82,6 +82,8 @@ Proyect with Apache Ariflow for ETL supporting
       
  - [Airflow To Upload Multiple Files to Google Cloud Storage](https://medium.com/@ossama.assaghir/uploading-multiple-files-to-google-cloud-storage-using-airflow-a19c9126bcd9)
 
+ - [Delete a file in Google Cloud Store with Airflow](https://airflow.apache.org/docs/apache-airflow-providers-google/stable/_api/airflow/providers/google/cloud/operators/gcs/index.html#airflow.providers.google.cloud.operators.gcs.GCSDeleteObjectsOperator)
+
 ## Google Query: Airflow copy Google Cloud Store
 
 2- Copy cvs file from Google Cloud Store to table in BigQuery
