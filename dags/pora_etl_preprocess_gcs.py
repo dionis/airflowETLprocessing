@@ -42,16 +42,16 @@ default_args = {'owner': dag_owner,
 #  Bibliografy:
 #     https://medium.com/@ossama.assaghir/uploading-multiple-files-to-google-cloud-storage-using-airflow-a19c9126bcd9
 #
-#    Create a GCP conection for working with BigQuery and Google Cloud Storage (GCS)
+#     Create a GCP conection for working with BigQuery and Google Cloud Storage (GCS)
 #
 #      https://data-ai.theodo.com/blog-technique/create-bigquery-data-pipelines-with-airflow-and-docker
 ############################################################
-with DAG(dag_id='upload_csv_files_to_gcs_copy_bigquery',
+with DAG(dag_id='pora_etl_preprocess_gcs_bigquery',
         default_args = default_args,
         description='',
         start_date = days_ago(2),
         schedule_interval = None,
-        catchup=False,
+        catchup = False,
         tags=['']
 ) as myDag:
 
@@ -189,15 +189,18 @@ with DAG(dag_id='upload_csv_files_to_gcs_copy_bigquery',
     #     skip_leading_rows = 1
     # )
 
- ####### Add any claim system DAG for parallel processing 
+ ############################################################################## 
  # 
- # ########################################################
+ #         Add any Trigger to claim system DAG for parallel processing 
+ #         read documentation about create each DAG in claim syste
+ #
+ # ###########################################################################
 
  
     trigger_remote_task_FACET = TriggerDagRunOperator(
         task_id = "trigger_remote_task_FACET",
         trigger_dag_id = "pora_claysistem_facet_dag",
-        conf = {"message_event": "Preprocess data end for FACET"},
+        conf = {"message_event": "Start process claim system FACET"},
         wait_for_completion = False,  
         execution_date = '{{ ds }}',
         reset_dag_run = True 
@@ -208,11 +211,22 @@ with DAG(dag_id='upload_csv_files_to_gcs_copy_bigquery',
     trigger_remote_task_USFHP = TriggerDagRunOperator(
        task_id = "trigger_remote_task_USFHP",
        trigger_dag_id = "pora_claysistem_usfhp_dag",
-       conf = {"message_event": "Preprocess data end for USFHP"},
+       conf = {"message_event": "Start process claim system USFHP"},
        wait_for_completion = False,  
        execution_date = '{{ ds }}',
        reset_dag_run = True       
-   )    
+   )   
+
+############################## End Claim System DAG trigger definition ##################################################### 
+
+    trigger_merger_all_claim_system_process_task = TriggerDagRunOperator(
+       task_id = "trigger_merger_all_claim_system_process",
+       trigger_dag_id = "pora_mergeplans",
+       conf = {"message_event": "Merger all all claim system start"},
+       wait_for_completion = False,  
+       execution_date = '{{ ds }}',
+       reset_dag_run = True       
+   )   
 
     delete_file_gcp_task = GoogleCloudStorageDeleteOperator(
                     task_id = f'delete_file_gcp_task',
@@ -224,4 +238,4 @@ with DAG(dag_id='upload_csv_files_to_gcs_copy_bigquery',
     
     end = EmptyOperator(task_id='end_pora_process_etl_task')
 
-    start >> upload_to_gcs >> copy_gcs_to_bigquery  >> [trigger_remote_task_FACET, trigger_remote_task_USFHP] >> delete_file_gcp_task >> end#
+    start >> upload_to_gcs >> copy_gcs_to_bigquery  >> [ trigger_remote_task_FACET, trigger_remote_task_USFHP, trigger_merger_all_claim_system_process_task] >> delete_file_gcp_task >> end#

@@ -2,6 +2,7 @@ from airflow import DAG
 from airflow.decorators import task
 from airflow.operators.empty import EmptyOperator
 from airflow.operators.python import PythonOperator
+from airflow.operators.bash_operator import BashOperator
 from airflow.sensors.external_task import ExternalTaskMarker, ExternalTaskSensor
 from airflow.utils.email import send_email
 from datetime import datetime, timedelta 
@@ -50,16 +51,17 @@ default_args = {'owner': dag_owner,
         'email_on_retry': False,
         }
 
-with DAG(dag_id ='pora_mergerplans',
-        default_args=default_args,
-        description='',
+with DAG(dag_id ='pora_mergeplans',
+        default_args = default_args,
+        description = '',
         start_date = days_ago(2),
-        schedule_interval = '*/5 * * * *',
-        catchup=False,
-        tags=['']
+        schedule_interval = None,
+       # schedule_interval = '*/5 * * * *',
+        catchup = False,
+        tags = ['']
 ) as my_dag:
 
-    start = EmptyOperator(task_id='start')
+    start = EmptyOperator(task_id = 'start')
 
     ##Sensor waiting for end task in claimsystem ehp-mc400
     
@@ -69,15 +71,26 @@ with DAG(dag_id ='pora_mergerplans',
 
     ##Sensor waiting for end task in claimsystem usfhp
     def merger_task():
-        print(f"Running mergerplans tasks ")
+        print(f" Running mergeplans tasks ")
 
     execute_python_task = PythonOperator(  
                                         task_id =f"mergerplan_continue_task",
                                          dag = my_dag,
                                          python_callable = merger_task)
-    end = EmptyOperator(task_id='end')
+   # end = EmptyOperator(task_id='end')
 
-    
+    # end_mergeplan = PythonOperator(  
+    #                     task_id =f"end_mergeplan_task",
+    #                     dag = my_dag,
+    #                     provide_context = True,
+    #                     python_callable = success_email)
+
+    end_mergeplan = BashOperator(
+        task_id = 'end_mergeplan_task',
+        bash_command = 'echo "Send notifications!!!"',
+        on_success_callback = lambda context: success_email(context),      
+        dag = my_dag
+    )
 
     #Set in paralel execution of sensor task and another task notified continue execution of the da
 
@@ -103,16 +116,6 @@ with DAG(dag_id ='pora_mergerplans',
     #     mode='reschedule',
     # )
 
-    child_parent_usfhp_task1 = ExternalTaskSensor(
-        task_id = f"child_parent_usfhp_task1",
-        external_dag_id = 'dag_python_execute',
-        #external_task_id = 'delay_python_execute_task',
-        check_existence = True,
-        execution_date_fn = get_execution_date,
-        #allowed_states=['success'],
-        #failed_states=['failed', 'skipped'],
-        #mode='reschedule',
-    )
 
     child_parent_facet_task_sensor = ExternalTaskSensor(
         task_id = f"pora_claysistem_facet_dag_endtask",
@@ -137,4 +140,4 @@ with DAG(dag_id ='pora_mergerplans',
     )
 
 
-    [child_parent_usfhp_task1 , child_parent_facet_task_sensor, child_parent_usfhp_task ] >> start >> execute_python_task >> end
+    [ child_parent_facet_task_sensor, child_parent_usfhp_task ] >> start >> execute_python_task >> end_mergeplan
